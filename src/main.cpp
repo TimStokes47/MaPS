@@ -9,6 +9,8 @@ int main(int, char**){
 
     while (!window.isClosed()){
         glfwPollEvents();
+        glClear(GL_COLOR_BUFFER_BIT);
+        renderer.renderTriangle();
         window.swapBuffers();
     }
 }
