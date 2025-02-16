@@ -1,7 +1,7 @@
 #include "renderer.h"
 #include "window.h"
 
-#include <iostream>
+#include "core/logging.h"
 
 void Renderer::assignWindow(Window& window)
 {
@@ -10,10 +10,10 @@ void Renderer::assignWindow(Window& window)
     if (!_isInitialised){
         int version = gladLoadGL(glfwGetProcAddress);
         if (version == 0){
-            std::cout << "Failed to initialise OpenGL context\n";
+            LOG_DEBUG("Failed to initialise OpenGL context");
             exit(-1);
         } else {
-            std::cout << "Loaded OpenGL " << GLAD_VERSION_MAJOR(version) << "." << GLAD_VERSION_MINOR(version) << "\n";
+            LOG_DEBUG("Loaded OpenGL " << GLAD_VERSION_MAJOR(version) << "." << GLAD_VERSION_MINOR(version));
         }
         _isInitialised = true;
     }

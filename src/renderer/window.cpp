@@ -1,14 +1,14 @@
 #include "window.h"
-#include <iostream>
+#include "core/logging.h"
 
 Window::Window(int width, int height, const std::string &title)
 {
     if (!_isGLFWInitialised){
         int initialisationSuccess = glfwInit();
         if (initialisationSuccess == GLFW_TRUE){
-            std::cout << "GLFW initialised\n";
+            LOG_DEBUG("GLFW initialised");
         } else {
-            std::cout << "Failed to initialise GLFW\n";
+            LOG_DEBUG("Failed to initialise GLFW");
             exit(-1);
         }
 
