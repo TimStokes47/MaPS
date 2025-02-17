@@ -68,6 +68,11 @@ void ShaderProgram::disable()
     glUseProgram(0);
 }
 
+void ShaderProgram::setUniform(const std::string &uniformName, const glm::mat4 &matrix)
+{
+    glUniformMatrix4fv(glGetUniformLocation(_handle, uniformName.c_str()), 1, GL_FALSE, &matrix[0][0]);
+}
+
 void ShaderProgram::attachShader(const Shader &shader)
 {
     glAttachShader(_handle, shader._handle);

@@ -1,4 +1,6 @@
 #pragma once
+
+#include <glm/glm.hpp>
 #include <string>
 
 enum class ShaderType{
@@ -25,6 +27,8 @@ public:
 
     void enable();
     void disable();
+
+    void setUniform(const std::string& uniformName, const glm::mat4& matrix);
 
     void attachShader(const Shader& shader);
     void link();

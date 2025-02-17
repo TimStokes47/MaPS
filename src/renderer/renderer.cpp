@@ -1,10 +1,12 @@
 #include "renderer.h"
 #include "window.h"
 #include "shader.h"
+#include "camera/camera.h"
 
 #include "core/logging.h"
 #include "core/fileUtilities.h"
 
+#include <glm/gtc/matrix_transform.hpp>
 #include <string>
 
 void Renderer::assignWindow(Window& window)
@@ -55,8 +57,14 @@ void Renderer::renderTriangle()
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), nullptr);
 
     shaderProgram.enable();
+    shaderProgram.setUniform("u_projection", _camera->getProjectionMatrix());
     glDrawArrays(GL_TRIANGLES, 0, 3);
     shaderProgram.disable();
+}
+
+void Renderer::assignCamera(Camera* camera)
+{
+    _camera = camera;
 }
 
 bool Renderer::_isInitialised = false;
