@@ -2,6 +2,7 @@
 #include "window.h"
 #include "shader.h"
 #include "camera/camera.h"
+#include "mesh/mesh.h"
 
 #include "core/logging.h"
 #include "core/fileUtilities.h"
@@ -25,14 +26,8 @@ void Renderer::assignWindow(Window& window)
     }
 }
 
-void Renderer::renderTriangle()
+void Renderer::renderMesh(const Mesh& mesh)
 {
-    float vertices[] = { 
-        0.0, 0.0, 
-        1.0f, 0.0f, 
-        1.0f, 1.0f
-    };
-
     std::string vertexShaderSource = readFileIntoString("../../resources/shaders/basic.vs");
     std::string fragmentShaderSource = readFileIntoString("../../resources/shaders/basic.fs");
 
@@ -44,22 +39,12 @@ void Renderer::renderTriangle()
     shaderProgram.attachShader(fragmentShader);
     shaderProgram.link();
 
-    unsigned int vertexArray;
-    glGenVertexArrays(1, &vertexArray);
-    glBindVertexArray(vertexArray);
-
-    unsigned int vertexBuffer;
-    glGenBuffers(1, &vertexBuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), nullptr);
-
+    mesh.vertexArray.bind();
     shaderProgram.enable();
     shaderProgram.setUniform("u_projection", _camera->getProjectionMatrix());
     glDrawArrays(GL_TRIANGLES, 0, 3);
     shaderProgram.disable();
+    mesh.vertexArray.unbind();
 }
 
 void Renderer::assignCamera(Camera* camera)

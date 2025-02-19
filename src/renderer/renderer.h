@@ -3,11 +3,12 @@
 
 class Window;
 class Camera;
+struct Mesh;
 
 class Renderer{
 public:
     void assignWindow(Window& window);
-    void renderTriangle();
+    void renderMesh(const Mesh& mesh);
     void assignCamera(Camera* camera);
 
 private:
