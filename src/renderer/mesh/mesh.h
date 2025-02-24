@@ -5,4 +5,5 @@
 struct Mesh{
     VertexArray vertexArray;
     glm::mat4 modelTransform;
+    unsigned int numberOfIndices;
 };

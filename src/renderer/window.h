@@ -1,4 +1,5 @@
 #pragma once
+
 #include <glfw/glfw3.h>
 #include <string>
 
@@ -12,6 +13,8 @@ public:
     void swapBuffers();
     void enable();
     void disable();
+
+    void enableImGui();
 
 private:
     GLFWwindow* _handle;

@@ -1,6 +1,8 @@
 #include "window.h"
 #include "core/logging.h"
 
+#include "backends/imgui_impl_glfw.h"
+
 Window::Window(int width, int height, const std::string &title)
 {
     if (!_isGLFWInitialised){
@@ -45,6 +47,11 @@ void Window::enable()
 void Window::disable()
 {
     glfwMakeContextCurrent(nullptr);
+}
+
+void Window::enableImGui()
+{
+    ImGui_ImplGlfw_InitForOpenGL(_handle, true);   
 }
 
 bool Window::_isGLFWInitialised = false;

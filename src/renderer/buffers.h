@@ -21,7 +21,20 @@ public:
     void bind() const;
     void unbind() const;
 
-    void setDataFormat(const VertexDataFormat& format) const;
+    void setDataFormat(const VertexDataFormat& format, unsigned int initialAttributeIndex = 0, unsigned int updateFrequency = 0) const;
+    void setAttributeUpdate(unsigned int frequency);
+
+private:
+    unsigned int _handle;
+};
+
+class IndexBuffer{
+public:
+    IndexBuffer(const std::vector<unsigned int>& data);
+    IndexBuffer(unsigned int bufferSize);
+
+    void bind() const;
+    void unbind() const;
 
 private:
     unsigned int _handle;

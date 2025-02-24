@@ -24,32 +24,90 @@ void Renderer::assignWindow(Window& window)
         }
         _isInitialised = true;
     }
-}
 
-void Renderer::renderMesh(const Mesh& mesh)
-{
-    std::string vertexShaderSource = readFileIntoString("../../resources/shaders/basic.vs");
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+
+    // Setup Dear ImGui style
+    ImGui::StyleColorsDark();
+    //ImGui::StyleColorsLight();
+    const char* glsl_version = "#version 130";
+    // Setup Platform/Renderer backends
+    window.enableImGui();
+    ImGui_ImplOpenGL3_Init(glsl_version);
+
+    std::string vertexShaderSource = readFileIntoString("../../resources/shaders/instancing.vs");
     std::string fragmentShaderSource = readFileIntoString("../../resources/shaders/basic.fs");
 
     Shader vertexShader(vertexShaderSource, ShaderType::VERTEX);
     Shader fragmentShader(fragmentShaderSource, ShaderType::FRAGMENT);
     
-    ShaderProgram shaderProgram;
-    shaderProgram.attachShader(vertexShader);
-    shaderProgram.attachShader(fragmentShader);
-    shaderProgram.link();
+    _instancingShader = new ShaderProgram;
+    _instancingShader->attachShader(vertexShader);
+    _instancingShader->attachShader(fragmentShader);
+    _instancingShader->link();
 
+
+    vertexShaderSource = readFileIntoString("../../resources/shaders/signedDistance.vs");
+    fragmentShaderSource = readFileIntoString("../../resources/shaders/signedDistance.fs");
+
+    Shader vertexShader2(vertexShaderSource, ShaderType::VERTEX);
+    Shader fragmentShader2(fragmentShaderSource, ShaderType::FRAGMENT);
+    
+    _signedDistanceShader = new ShaderProgram;
+    _signedDistanceShader->attachShader(vertexShader2);
+    _signedDistanceShader->attachShader(fragmentShader2);
+    _signedDistanceShader->link();
+}
+
+void Renderer::renderMesh(const Mesh& mesh)
+{
     mesh.vertexArray.bind();
-    shaderProgram.enable();
-    shaderProgram.setUniform("u_projection", _camera->getProjectionMatrix());
-    glDrawArrays(GL_TRIANGLES, 0, 3);
-    shaderProgram.disable();
+    _instancingShader->enable();
+    _instancingShader->setUniform("u_projection", _camera->getProjectionMatrix());
+    glDrawElements(GL_TRIANGLES, mesh.numberOfIndices, GL_UNSIGNED_INT, nullptr);
+    _instancingShader->disable();
+    mesh.vertexArray.unbind();
+}
+
+void Renderer::renderMeshInstanced(const Mesh &mesh, unsigned int numberOfInstances)
+{
+    mesh.vertexArray.bind();
+    _instancingShader->enable();
+    _instancingShader->setUniform("u_projection", _camera->getProjectionMatrix());
+    glDrawElementsInstanced(GL_TRIANGLES, mesh.numberOfIndices, GL_UNSIGNED_INT, nullptr, numberOfInstances);
+    _instancingShader->disable();
     mesh.vertexArray.unbind();
 }
 
 void Renderer::assignCamera(Camera* camera)
 {
     _camera = camera;
+}
+
+void Renderer::renderScreen(const Mesh& mesh)
+{
+    mesh.vertexArray.bind();
+    _signedDistanceShader->enable();
+    _signedDistanceShader->setUniform("u_projection", _camera->getProjectionMatrix());
+    glDrawElements(GL_TRIANGLES, mesh.numberOfIndices, GL_UNSIGNED_INT, nullptr);
+    _signedDistanceShader->disable();
+    mesh.vertexArray.unbind();
+}
+
+void Renderer::renderText(const std::string &text)
+{
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui_ImplGlfw_NewFrame();
+    ImGui::NewFrame();
+
+    ImGui::Text(text.c_str());
+
+    ImGui::Render();
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
 bool Renderer::_isInitialised = false;

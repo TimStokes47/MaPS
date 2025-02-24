@@ -53,19 +53,20 @@ unsigned int getGLIdentifier(DataType dataType){
     return -1;
 }
 
-void VertexBuffer::setDataFormat(const VertexDataFormat &format) const
+void VertexBuffer::setDataFormat(const VertexDataFormat &format, unsigned int initialAttributeIndex, unsigned int updateFrequency) const
 {
     size_t stride = 0;
     for (auto& typeBlock : format){
         stride += size(typeBlock.first) * typeBlock.second;
     }
 
-    unsigned int index = 0;
+    unsigned int index = initialAttributeIndex;
     size_t offset = 0;
     for (auto& typeBlock : format){
         size_t typeBlockSize = size(typeBlock.first) * typeBlock.second;
         glEnableVertexAttribArray(index);
         glVertexAttribPointer(index, typeBlock.second, getGLIdentifier(typeBlock.first), GL_FALSE, typeBlockSize, (void*)offset);
+        glVertexAttribDivisor(index, updateFrequency);
         offset += typeBlockSize;
     }
 }
@@ -83,4 +84,30 @@ void VertexArray::bind() const
 void VertexArray::unbind() const
 {
     glBindVertexArray(0);
+}
+
+IndexBuffer::IndexBuffer(const std::vector<unsigned int> &data)
+{
+    glGenBuffers(1, &_handle);
+    bind();
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, data.size() * sizeof(unsigned int), data.data(), GL_STATIC_DRAW);
+    unbind();
+}
+
+IndexBuffer::IndexBuffer(unsigned int bufferSize)
+{
+    glGenBuffers(1, &_handle);
+    bind();
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, bufferSize * sizeof(unsigned int), nullptr, GL_STATIC_DRAW);
+    unbind();
+}
+
+void IndexBuffer::bind() const
+{
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _handle);
+}
+
+void IndexBuffer::unbind() const
+{
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
